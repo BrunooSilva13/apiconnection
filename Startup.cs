@@ -32,18 +32,14 @@ public class Startup
             app.UseDeveloperExceptionPage();
         }
 
-        // Configuração de middleware
-        app.UseHttpsRedirection();
         app.UseRouting();
-        app.UseAuthorization();
-
         app.UseEndpoints(endpoints =>
-        {
-            endpoints.MapGet("/", async context =>
-            {
-                await context.Response.WriteAsync("Bem-vindo à minha aplicação!");
-            });
+         {
+             endpoints.MapControllerRoute(
+                 name: "default",
+                 pattern: "{controller=Home}/{action=Index}/{id?}");
+         });
 
-        });
+
     }
 }
