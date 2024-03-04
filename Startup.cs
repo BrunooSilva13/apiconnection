@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System.Data.SqlClient;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using System.Collections.Generic;
