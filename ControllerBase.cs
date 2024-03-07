@@ -5,6 +5,8 @@ using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 
+
+
 [ApiController]
 [Route("api/[controller]")]
 public class MyController : ControllerBase
@@ -27,7 +29,7 @@ public class MyController : ControllerBase
 
                 // Execute sua consulta SQL aqui
                 // Por exemplo:
-                string query = "SELECT * FROM Produto";
+                string query = "SELECT * FROM produtos";
                 using (var command = new MySqlCommand(query, connection))
                 {
                     using (var reader = command.ExecuteReader())
@@ -41,8 +43,8 @@ public class MyController : ControllerBase
                             var item = new
                             {
                                 Produto = reader["nome"],
-                                Descrição = reader["descricao"],
-                                Preço = reader["preco"],
+                                Descricao = reader["descricao"],
+                                Preco = reader["preco"],
                                 Status = reader["status_vendas"]
                                 // Adicione mais propriedades conforme necessário
                             };
@@ -69,7 +71,7 @@ public class MyController : ControllerBase
             using (var connection = new MySqlConnection(_connectionString))
             {
                 connection.Open();
-                string query = "INSERT INTO Produto (nome, descricao, preco, status_vendas) VALUES (@nome, @descricao, @preco, @status_vendas)";
+                string query = "INSERT INTO produtos (nome, descricao, preco, status_vendas) VALUES (@nome, @descricao, @preco, @status_vendas)";
                 using (var command = new MySqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@nome", produto.Nome);
