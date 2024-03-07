@@ -24,6 +24,7 @@ public class Startup
     {
         // Configuração de serviços, como DI, autenticação, etc.
         services.AddControllers();
+        
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
