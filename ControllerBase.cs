@@ -1,21 +1,41 @@
-using apiConnection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 
-
-
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/produtos")]
 public class MyController : ControllerBase
 {
     private readonly string _connectionString;
 
     public MyController(IConfiguration configuration)
     {
-        _connectionString = "server=127.0.0.1;uid=adm-produto;pwd=senha4321;database=api_produto";
+        _connectionString = "server=127.0.0.1;uid=adm-produto;pwd=senha4321;";
+        using (MySqlConnection mysqlConnection = new MySqlConnection(_connectionString))
+        {
+            mysqlConnection.Open();
+            using (MySqlCommand cmd = mysqlConnection.CreateCommand())
+            {
+                cmd.CommandText = $"CREATE DATABASE IF NOT EXISTS api_produto";
+                cmd.ExecuteNonQuery();
+
+                cmd.CommandText = $"USE api_produto";
+                cmd.ExecuteNonQuery();
+
+                // Produtos
+                cmd.CommandText = @"
+                    CREATE TABLE IF NOT EXISTS produtos (
+                        Id INT AUTO_INCREMENT PRIMARY KEY,
+                        Nome VARCHAR(255),
+                        Descricao VARCHAR(255),
+                        Preco FLOAT,
+                        Status BOOLEAN
+                    );";
+                cmd.ExecuteNonQuery();
+            }
+        }
     }
 
     [HttpGet]
@@ -23,30 +43,24 @@ public class MyController : ControllerBase
     {
         try
         {
-            using (var connection = new MySqlConnection(_connectionString))
+            using (var connection = new MySqlConnection(_connectionString + "database=api_produto;"))
             {
                 connection.Open();
 
-                // Execute sua consulta SQL aqui
-                // Por exemplo:
                 string query = "SELECT * FROM produtos";
                 using (var command = new MySqlCommand(query, connection))
                 {
                     using (var reader = command.ExecuteReader())
                     {
-                        // Processar os resultados da consulta
-                        // Por exemplo, criar uma lista de objetos ou retornar os dados diretamente
-                        // Exemplo:
                         var result = new List<object>();
                         while (reader.Read())
                         {
                             var item = new
                             {
-                                Produto = reader["nome"],
-                                Descricao = reader["descricao"],
-                                Preco = reader["preco"],
-                                Status = reader["status_vendas"]
-                                // Adicione mais propriedades conforme necessário
+                                Nome = reader["Nome"],
+                                Descricao = reader["Descricao"],
+                                Preco = reader["Preco"],
+                                Status = reader["Status"]
                             };
                             result.Add(item);
                         }
@@ -58,7 +72,6 @@ public class MyController : ControllerBase
         }
         catch (Exception ex)
         {
-            // Trate qualquer exceção aqui
             return StatusCode(500, $"Erro interno do servidor: {ex.Message}");
         }
     }
@@ -68,16 +81,16 @@ public class MyController : ControllerBase
     {
         try
         {
-            using (var connection = new MySqlConnection(_connectionString))
+            using (var connection = new MySqlConnection(_connectionString + "database=api_produto;"))
             {
                 connection.Open();
-                string query = "INSERT INTO produtos (nome, descricao, preco, status_vendas) VALUES (@nome, @descricao, @preco, @status_vendas)";
+                string query = "INSERT INTO produtos (Nome, Descricao, Preco, Status) VALUES (@nome, @descricao, @preco, @status)";
                 using (var command = new MySqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@nome", produto.Nome);
                     command.Parameters.AddWithValue("@descricao", produto.Descricao);
                     command.Parameters.AddWithValue("@preco", produto.Preco);
-                    command.Parameters.AddWithValue("@status_vendas", produto.Status);
+                    command.Parameters.AddWithValue("@status", produto.Status);
                     command.ExecuteNonQuery();
                 }
             }
