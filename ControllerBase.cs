@@ -1,36 +1,34 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using MySql.Data.MySqlClient;
-using System;
-using System.Collections.Generic;
 
 [ApiController]
-[Route("api/produtos")]
+[Route("api/products")]
 public class MyController : ControllerBase
 {
     private readonly string _connectionString;
 
     public MyController(IConfiguration configuration)
     {
-        _connectionString = "server=127.0.0.1;uid=adm-produto;pwd=senha4321;";
+        _connectionString = "server=127.0.0.1;uid=adm-produtc;pwd=senha4321;";
         using (MySqlConnection mysqlConnection = new MySqlConnection(_connectionString))
         {
             mysqlConnection.Open();
             using (MySqlCommand cmd = mysqlConnection.CreateCommand())
             {
-                cmd.CommandText = $"CREATE DATABASE IF NOT EXISTS api_produto";
+                cmd.CommandText = $"CREATE DATABASE IF NOT EXISTS api_product";
                 cmd.ExecuteNonQuery();
 
-                cmd.CommandText = $"USE api_produto";
+                cmd.CommandText = $"USE api_product";
                 cmd.ExecuteNonQuery();
 
-                // Produtos
+                // products
                 cmd.CommandText = @"
-                    CREATE TABLE IF NOT EXISTS produtos (
+                    CREATE TABLE IF NOT EXISTS products (
                         Id INT AUTO_INCREMENT PRIMARY KEY,
-                        Nome VARCHAR(255),
-                        Descricao VARCHAR(255),
-                        Preco FLOAT,
+                        Name VARCHAR(255),
+                        Description VARCHAR(255),
+                        Price FLOAT,
                         Status BOOLEAN
                     );";
                 cmd.ExecuteNonQuery();
@@ -43,11 +41,11 @@ public class MyController : ControllerBase
     {
         try
         {
-            using (var connection = new MySqlConnection(_connectionString + "database=api_produto;"))
+            using (var connection = new MySqlConnection(_connectionString + "database=api_product;"))
             {
                 connection.Open();
 
-                string query = "SELECT * FROM produtos";
+                string query = "SELECT * FROM products";
                 using (var command = new MySqlCommand(query, connection))
                 {
                     using (var reader = command.ExecuteReader())
@@ -57,9 +55,9 @@ public class MyController : ControllerBase
                         {
                             var item = new
                             {
-                                Nome = reader["Nome"],
-                                Descricao = reader["Descricao"],
-                                Preco = reader["Preco"],
+                                Name = reader["Name"],
+                                Description = reader["Description"],
+                                Price = reader["Price"],
                                 Status = reader["Status"]
                             };
                             result.Add(item);
@@ -72,59 +70,59 @@ public class MyController : ControllerBase
         }
         catch (Exception ex)
         {
-            return StatusCode(500, $"Erro interno do servidor: {ex.Message}");
+            return StatusCode(500, $"Internal server error: {ex.Message}");
         }
     }
 
     [HttpPost]
-    public IActionResult Post(Produto produto)
+    public IActionResult Post(Product product)
     {
         try
         {
-            using (var connection = new MySqlConnection(_connectionString + "database=api_produto;"))
+            using (var connection = new MySqlConnection(_connectionString + "database=api_product;"))
             {
                 connection.Open();
-                string query = "INSERT INTO produtos (Nome, Descricao, Preco, Status) VALUES (@nome, @descricao, @preco, @status)";
+                string query = "INSERT INTO products (Name, Description, Price, Status) VALUES (@name, @description, @price, @status)";
                 using (var command = new MySqlCommand(query, connection))
                 {
-                    command.Parameters.AddWithValue("@nome", produto.Nome);
-                    command.Parameters.AddWithValue("@descricao", produto.Descricao);
-                    command.Parameters.AddWithValue("@preco", produto.Preco);
-                    command.Parameters.AddWithValue("@status", produto.Status);
+                    command.Parameters.AddWithValue("@name", product.Name);
+                    command.Parameters.AddWithValue("@description", product.Description);
+                    command.Parameters.AddWithValue("@price", product.Price);
+                    command.Parameters.AddWithValue("@status", product.Status);
                     command.ExecuteNonQuery();
                 }
             }
-            return Ok("Produto criado com sucesso!");
+            return Ok("product created successfully!");
         }
         catch (Exception ex)
         {
-            return StatusCode(500, $"Erro ao criar produto: {ex.Message}");
+            return StatusCode(500, $"Error creating product: {ex.Message}");
         }
     }
     [HttpPut("{id}")]
-    public IActionResult Put(int id, Produto produto)
+    public IActionResult Put(int id, Product product)
     {
         try
         {
-            using (var connection = new MySqlConnection(_connectionString + "database=api_produto;"))
+            using (var connection = new MySqlConnection(_connectionString + "database=api_product;"))
             {
                 connection.Open();
-                string query = "UPDATE produtos SET Nome = @nome, Descricao = @descricao, Preco = @preco, Status = @status WHERE Id = @id";
+                string query = "UPDATE products SET Name = @name, Description = @description, Price = @price, Status = @status WHERE Id = @id";
                 using (var command = new MySqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@id", id);
-                    command.Parameters.AddWithValue("@nome", produto.Nome);
-                    command.Parameters.AddWithValue("@descricao", produto.Descricao);
-                    command.Parameters.AddWithValue("@preco", produto.Preco);
-                    command.Parameters.AddWithValue("@status", produto.Status);
+                    command.Parameters.AddWithValue("@name", product.Name);
+                    command.Parameters.AddWithValue("@description", product.Description);
+                    command.Parameters.AddWithValue("@price", product.Price);
+                    command.Parameters.AddWithValue("@status", product.Status);
                     command.ExecuteNonQuery();
                 }
             }
-            return Ok("Produto atualizado com sucesso!");
+            return Ok("product updated successfully!");
         }
         catch (Exception ex)
         {
-            return StatusCode(500, $"Erro ao atualizar produto: {ex.Message}");
+            return StatusCode(500, $"Error updating product: {ex.Message}");
         }
     }
 
@@ -133,21 +131,21 @@ public class MyController : ControllerBase
     {
         try
         {
-            using (var connection = new MySqlConnection(_connectionString + "database=api_produto;"))
+            using (var connection = new MySqlConnection(_connectionString + "database=api_product;"))
             {
                 connection.Open();
-                string query = "DELETE FROM produtos WHERE Id = @id";
+                string query = "DELETE FROM products WHERE Id = @id";
                 using (var command = new MySqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@id", id);
                     command.ExecuteNonQuery();
                 }
             }
-            return Ok("Produto excluído com sucesso!");
+            return Ok("product successfully deleted!");
         }
         catch (Exception ex)
         {
-            return StatusCode(500, $"Erro ao excluir produto: {ex.Message}");
+            return StatusCode(500, $"Error deleting product: {ex.Message}");
         }
     }
 

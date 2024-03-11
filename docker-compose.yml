@@ -7,8 +7,8 @@ services:
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: senha4321
-      MYSQL_DATABASE: api_produto
-      MYSQL_USER: adm-produto
+      MYSQL_DATABASE: api_product
+      MYSQL_USER: adm-product
       MYSQL_PASSWORD: senha4321
     ports:
       - "3306:3306"
