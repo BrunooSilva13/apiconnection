@@ -101,4 +101,32 @@ public class MyController : ControllerBase
             return StatusCode(500, $"Erro ao criar produto: {ex.Message}");
         }
     }
+    [HttpPut("{id}")]
+    public IActionResult Put(int id, Produto produto)
+    {
+        try
+        {
+            using (var connection = new MySqlConnection(_connectionString + "database=api_produto;"))
+            {
+                connection.Open();
+                string query = "UPDATE produtos SET Nome = @nome, Descricao = @descricao, Preco = @preco, Status = @status WHERE Id = @id";
+                using (var command = new MySqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@id", id);
+                    command.Parameters.AddWithValue("@nome", produto.Nome);
+                    command.Parameters.AddWithValue("@descricao", produto.Descricao);
+                    command.Parameters.AddWithValue("@preco", produto.Preco);
+                    command.Parameters.AddWithValue("@status", produto.Status);
+                    command.ExecuteNonQuery();
+                }
+            }
+            return Ok("Produto atualizado com sucesso!");
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Erro ao atualizar produto: {ex.Message}");
+        }
+    }
+
+
 }
