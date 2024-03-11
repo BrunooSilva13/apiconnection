@@ -128,5 +128,27 @@ public class MyController : ControllerBase
         }
     }
 
+    [HttpDelete("{id}")]
+    public IActionResult Delete(int id)
+    {
+        try
+        {
+            using (var connection = new MySqlConnection(_connectionString + "database=api_produto;"))
+            {
+                connection.Open();
+                string query = "DELETE FROM produtos WHERE Id = @id";
+                using (var command = new MySqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@id", id);
+                    command.ExecuteNonQuery();
+                }
+            }
+            return Ok("Produto excluído com sucesso!");
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Erro ao excluir produto: {ex.Message}");
+        }
+    }
 
 }
