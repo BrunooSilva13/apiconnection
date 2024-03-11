@@ -10,7 +10,7 @@ public class MyController : ControllerBase
 
     public MyController(IConfiguration configuration)
     {
-        _connectionString = "server=127.0.0.1;uid=adm-produtc;pwd=senha4321;";
+        _connectionString = "server=127.0.0.1;uid=adm-product;pwd=senha4321;";
         using (MySqlConnection mysqlConnection = new MySqlConnection(_connectionString))
         {
             mysqlConnection.Open();
@@ -79,20 +79,30 @@ public class MyController : ControllerBase
     {
         try
         {
-            using (var connection = new MySqlConnection(_connectionString + "database=api_product;"))
-            {
-                connection.Open();
-                string query = "INSERT INTO products (Name, Description, Price, Status) VALUES (@name, @description, @price, @status)";
-                using (var command = new MySqlCommand(query, connection))
+          //condicionais para verificar se todos os campos que o front tá enviando existem 
+          
+            
+                if (product == null || string.IsNullOrEmpty(product.Name) || string.IsNullOrEmpty(product.Description) || product.Price <= 0 || product.Status == null)
                 {
-                    command.Parameters.AddWithValue("@name", product.Name);
-                    command.Parameters.AddWithValue("@description", product.Description);
-                    command.Parameters.AddWithValue("@price", product.Price);
-                    command.Parameters.AddWithValue("@status", product.Status);
-                    command.ExecuteNonQuery();
+                    return BadRequest("all fields are mandatory.");
                 }
-            }
+
+          
+                using (var connection = new MySqlConnection(_connectionString + "database=api_product;"))
+                {
+                    connection.Open();
+                    string query = "INSERT INTO products (Name, Description, Price, Status) VALUES (@name, @description, @price, @status)";
+                    using (var command = new MySqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@name", product.Name);
+                        command.Parameters.AddWithValue("@description", product.Description);
+                        command.Parameters.AddWithValue("@price", product.Price);
+                        command.Parameters.AddWithValue("@status", product.Status);
+                        command.ExecuteNonQuery();
+                    }
+                }   
             return Ok("product created successfully!");
+            
         }
         catch (Exception ex)
         {
@@ -104,6 +114,11 @@ public class MyController : ControllerBase
     {
         try
         {
+            if (product == null || string.IsNullOrEmpty(product.Name) || string.IsNullOrEmpty(product.Description) || product.Price <= 0 || product.Status == null)
+                {
+                    return BadRequest("all fields are mandatory.");
+                }
+            
             using (var connection = new MySqlConnection(_connectionString + "database=api_product;"))
             {
                 connection.Open();
