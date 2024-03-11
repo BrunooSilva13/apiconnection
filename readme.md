@@ -1,7 +1,11 @@
+# Titulo:
+
+Descrição
+
 ### TO-DO
 
-- [ ] Traduzir pt para en.
-- [ ] Validar api
-   - [ ] Body das requisições 
+- [x] Traduzir pt para en.
+- [x] Validar api
+    - [x] Body das requisições 
 - [ ] Organizar repositorio do github
 - [ ] Pedir um desafio pro @gabrieldejesus
